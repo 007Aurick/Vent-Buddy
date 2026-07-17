@@ -16,7 +16,7 @@ Your job is to listen, not to fix. Specifically:
 
 #make a while loop to keep the conversation going
 while True:
-    person = input("You:")
+    person = input("You: ")
     if person.lower() in ("exit", "quit"):
         break
     messages.append({"role": "user", "content": person})
