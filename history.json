@@ -1,0 +1,42 @@
+[
+  {
+    "role": "system",
+    "content": "You are VentBuddy, a supportive companion someone can vent to.\n\nYour job is to listen, not to fix. Specifically:\n- Reflect back what the person shares so they feel heard (e.g. \"that sounds really frustrating\")\n- Ask open questions that invite them to keep talking, rather than jumping to solutions\n- Don't offer advice or suggestions unless they explicitly ask for it\n- Keep your responses short and conversational \u2014 this is a conversation, not a lecture\n- Avoid clinical or therapist-sounding language (\"it sounds like you're experiencing...\") \u2014 talk like a caring friend, not a textbook\n- Never minimize what they're feeling or rush them toward feeling better"
+  },
+  {
+    "role": "user",
+    "content": "Having trouble keeping up with school, hella stressed, can you help bro. need some advice?"
+  },
+  {
+    "role": "user",
+    "content": "I'm not sure man, just struggling to adjust to university, moving away from home, I get homesick"
+  },
+  {
+    "role": "user",
+    "content": "Just not being able to see my parents icl, and living on my own"
+  },
+  {
+    "role": "user",
+    "content": "I just said it"
+  },
+  {
+    "role": "user",
+    "content": "idk man, it's the longest I've been without them, that's the problem"
+  },
+  {
+    "role": "user",
+    "content": "Having trouble adjusting to uni life"
+  },
+  {
+    "role": "user",
+    "content": "I think just learning about new responsibilities and whatnot, it's tough"
+  },
+  {
+    "role": "user",
+    "content": "I am studying but I just miss home, How to not feel so homesick?"
+  },
+  {
+    "role": "user",
+    "content": "yes"
+  }
+]

@@ -3,13 +3,19 @@ import json
 import os
 
 model = init_chat_model("ollama:llama3.1", temperature=0.7)
-messages = [
-    {"role": "system", "content": """You are VentBuddy, a supportive companion someone can vent to.
+
+if os.path.exists("history.json") and os.path.getsize("history.json") > 0:
+    with open("history.json", "r") as f:
+        messages = json.load(f)
+else:
+    messages = [
+        {"role": "system", "content": """You are VentBuddy, a supportive companion someone can vent to.
 
 Your job is to listen, not to fix. Specifically:
 - Reflect back what the person shares so they feel heard (e.g. "that sounds really frustrating")
 - Ask open questions that invite them to keep talking, rather than jumping to solutions
-- Don't offer advice or suggestions unless they explicitly ask for it
+- Give advice like how a friend would, not like a therapist or counselor
+- You don't have to ask questions every time, if you feel like you understand the conversation, feel free to give your own advice or share your own experiences
 - Keep your responses short and conversational — this is a conversation, not a lecture
 - Avoid clinical or therapist-sounding language ("it sounds like you're experiencing...") — talk like a caring friend, not a textbook
 - Never minimize what they're feeling or rush them toward feeling better"""}
@@ -36,6 +42,10 @@ while True:
     response = model.invoke(messages)
     
     print("AI:", response.content)
+
+    with open("history.json", "w") as f:
+        json.dump(messages, f, indent=2)
+    
 
 
 
