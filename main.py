@@ -1,6 +1,9 @@
 from langchain.chat_models import init_chat_model
 import json
 import os
+import whisper
+
+
 
 model = init_chat_model("ollama:llama3.1", temperature=0.7)
 
