@@ -5,7 +5,7 @@ import whisper
 sampleRate = 44100
 
 
-duration = 5
+duration = result["text"]
 
 print("Recording...")
 recording = sd.rec(int(duration * sampleRate), samplerate=sampleRate, channels=2)
