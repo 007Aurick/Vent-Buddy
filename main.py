@@ -31,7 +31,7 @@ while True:
     person = input("You: ")
     if person.lower() in ("exit", "quit"):
         break
-    messages.append({"role": "user", "content": person})
+    messages.append({"role": "user", "content": person})#Append the user's message to the messages list
     for keyword in CRISIS_KEYWORDS:
         crisis_detected = False
         if keyword in person.lower():
@@ -44,7 +44,7 @@ while True:
 
     print("AI:", response.content)
 
-    messages.append({"role": "assistant", "content": response.content})
+    messages.append({"role": "assistant", "content": response.content})#Append the Chatbot's response to the messages list
 
     with open("history.json", "w") as f:
         json.dump(messages, f, indent=2)
