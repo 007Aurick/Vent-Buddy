@@ -1,4 +1,4 @@
-# 🎙️ Vent To Me
+# 🎙️ VentBuddy
 
 > A local, private AI companion to vent to — built with LangChain + Ollama. No advice, no judgment, just someone who remembers what you said. 💬
 
@@ -77,12 +77,4 @@ VentBuddy: That sounds heavy. Want to tell me what happened?
 
 VentBuddy is a **listening companion**, not a licensed therapist and not a crisis service. If you're in crisis or experiencing thoughts of self-harm, please reach out to a real human — a crisis line, a trusted person, or a professional. 💛
 
----
 
-## 📄 License
-
-MIT — do whatever you want with it.
-
----
-
-<p align="center">Made with 🦜🔗 and way too much coffee ☕</p>
