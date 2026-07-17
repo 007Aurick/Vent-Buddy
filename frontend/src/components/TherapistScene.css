@@ -1,0 +1,121 @@
+.therapist-wrapper {
+  width: min(320px, 72vw);
+  animation: therapist-sway 7s ease-in-out infinite;
+  transform-origin: bottom center;
+}
+
+@keyframes therapist-sway {
+  0%, 100% {
+    transform: rotate(-0.6deg);
+  }
+  50% {
+    transform: rotate(0.6deg);
+  }
+}
+
+.therapist-svg {
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.rug {
+  fill: #e7dcc8;
+}
+
+.chair-back,
+.chair-arm,
+.chair-seat {
+  fill: #d79b53;
+}
+
+.chair-seat {
+  fill: #c98a3c;
+}
+
+.chair-leg {
+  fill: #6b4a30;
+}
+
+.leg {
+  fill: #ded2b8;
+}
+
+.shoe {
+  fill: #4a3728;
+}
+
+.torso-group {
+  animation: breathe 4.2s ease-in-out infinite;
+  transform-origin: 210px 300px;
+}
+
+@keyframes breathe {
+  0%, 100% {
+    transform: scaleY(1);
+  }
+  50% {
+    transform: scaleY(1.015);
+  }
+}
+
+.torso,
+.arm {
+  fill: #6fa393;
+}
+
+.hand {
+  fill: #dba876;
+}
+
+.neck {
+  fill: #dba876;
+}
+
+.head {
+  fill: #dba876;
+}
+
+.hair-back,
+.hair-top {
+  fill: #4a3728;
+}
+
+.blush {
+  fill: #e98c74;
+  opacity: 0.35;
+}
+
+.eyes {
+  animation: therapist-blink 5.5s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.eye {
+  fill: #33302b;
+}
+
+.smile {
+  fill: none;
+  stroke: #33302b;
+  stroke-width: 3;
+  opacity: 0.85;
+}
+
+@keyframes therapist-blink {
+  0%, 92%, 100% {
+    transform: scaleY(1);
+  }
+  95% {
+    transform: scaleY(0.15);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .therapist-wrapper,
+  .torso-group,
+  .eyes {
+    animation: none !important;
+  }
+}

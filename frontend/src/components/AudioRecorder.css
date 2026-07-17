@@ -1,0 +1,239 @@
+.recorder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  width: min(420px, 92vw);
+}
+
+.recorder-error {
+  color: #c94a4a;
+  font-size: 14px;
+  text-align: center;
+  margin-bottom: 4px;
+}
+
+.mic-button {
+  width: 86px;
+  height: 86px;
+  border-radius: 50%;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(140deg, #7bf0c8, #4fb8ff);
+  color: #05201c;
+  box-shadow: 0 10px 30px -8px rgba(87, 201, 240, 0.6);
+  transition: transform 0.2s ease;
+}
+
+.mic-button svg {
+  width: 32px;
+  height: 32px;
+}
+
+.mic-button:hover {
+  transform: scale(1.05);
+}
+
+.mic-button.recording {
+  background: linear-gradient(140deg, #ff8a8a, #ff5c7a);
+  color: #2a0508;
+  animation: mic-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes mic-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(255, 92, 122, 0.45), 0 10px 30px -8px rgba(255, 92, 122, 0.6);
+  }
+  50% {
+    box-shadow: 0 0 0 16px rgba(255, 92, 122, 0), 0 10px 30px -8px rgba(255, 92, 122, 0.7);
+  }
+}
+
+.recording-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.recording-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-variant-numeric: tabular-nums;
+  color: #4a3f30;
+  font-size: 15px;
+}
+
+.rec-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #ff5c7a;
+  animation: dot-blink 1.2s ease-in-out infinite;
+}
+
+@keyframes dot-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.25; }
+}
+
+.review-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid #ece1cb;
+  border-radius: 24px;
+  padding: 22px 22px 18px;
+  box-shadow: 0 14px 34px -16px rgba(87, 74, 55, 0.28);
+}
+
+.review-controls {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.play-button {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: none;
+  background: #e8f6f1;
+  color: #2f8a76;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.play-button svg {
+  width: 20px;
+  height: 20px;
+}
+
+.time-readout {
+  font-variant-numeric: tabular-nums;
+  color: #7a6c54;
+  font-size: 14px;
+}
+
+.trim-track {
+  position: relative;
+  width: 100%;
+  height: 40px;
+  margin-top: 6px;
+  touch-action: none;
+}
+
+.trim-track-bg {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 8px;
+  transform: translateY(-50%);
+  background: #ede3cd;
+  border-radius: 999px;
+}
+
+.trim-range {
+  position: absolute;
+  top: 50%;
+  height: 8px;
+  transform: translateY(-50%);
+  background: linear-gradient(90deg, #7bf0c8, #57c9f0);
+  border-radius: 999px;
+}
+
+.trim-playhead {
+  position: absolute;
+  top: 4px;
+  width: 2px;
+  height: 32px;
+  background: #4a3f30;
+  opacity: 0.7;
+  transform: translateX(-1px);
+  pointer-events: none;
+}
+
+.trim-handle {
+  position: absolute;
+  top: 50%;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 3px solid #57c9f0;
+  transform: translate(-50%, -50%);
+  cursor: grab;
+  touch-action: none;
+}
+
+.trim-handle:active {
+  cursor: grabbing;
+}
+
+.trim-hint {
+  font-size: 12.5px;
+  color: #a89a7c;
+  margin: 0;
+}
+
+.review-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.ghost-button,
+.primary-button {
+  padding: 12px 26px;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 14.5px;
+  border: none;
+  font-family: var(--heading);
+}
+
+.ghost-button {
+  background: #faf6ee;
+  color: #4a3f30;
+  border: 1px solid #e6dcc8;
+}
+
+.primary-button {
+  background: linear-gradient(100deg, #7bf0c8, #57c9f0);
+  color: #04211c;
+}
+
+.ghost-button:disabled,
+.primary-button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.recorder.sent {
+  align-items: center;
+  text-align: center;
+  gap: 14px;
+  color: #4a3f30;
+}
+
+.sent-check {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(140deg, #7bf0c8, #4fb8ff);
+  color: #05201c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  font-weight: 700;
+  animation: fade-in-up 0.5s ease both;
+}
