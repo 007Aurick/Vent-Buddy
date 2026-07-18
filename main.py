@@ -30,8 +30,11 @@ else:
 ]
 
 CRISIS_KEYWORDS = ["suicide", "self-harm", "hurt myself", "kill myself", "end my life", "want to die", "want to kill myself", "want to end my life", "want to hurt myself"]
-
-
+EXIT_PHRASES = [
+    "exit", "quit", "goodbye", "good bye", "bye",
+    "that's all", "thats all", "i'm done", "im done",
+    "i'm good", "that's it", "thats it", "see you", "talk later"
+]
 
 r = sr.Recognizer()
 r.pause_threshold = 3.0
@@ -64,7 +67,7 @@ while True:
         print("No speech detected. Please try again.")
         continue
 
-    if person.lower() in ["exit", "quit", "bye"]:
+    if any(phrase in person.lower() for phrase in EXIT_PHRASES):
         print("Exiting the conversation. Take care!")
         break
     messages.append({"role": "user", "content": person})#Append the user's message to the messages list
@@ -80,10 +83,6 @@ while True:
     response = model.invoke(messages)
     print("AI:", response.content)
     speak(response.content)
-
-    
-
-    
 
     messages.append({"role": "assistant", "content": response.content})#Append the Chatbot's response to the messages list
 
