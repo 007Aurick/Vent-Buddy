@@ -53,15 +53,15 @@ def speak(text):
 while True:
     with sr.Microphone() as source:
         print("Adjusting for ambient noise...")
-        r.adjust_for_ambient_noise(source,duration=1)
+        r.adjust_for_ambient_noise(source,duration=1)#looking for background noise for 1 second to adjust the energy threshold
         print(f"Minimum energy threshold set to: {r.energy_threshold}")
         print("Listening...")
-        audio = r.listen(source)
+        audio = r.listen(source)#listens for user speech
    
-    with open("output.wav", "wb") as f:
-        f.write(audio.get_wav_data())
+    with open("output.wav", "wb") as f: #overwrite the output.wav file with the new audio data
+        f.write(audio.get_wav_data())#writes the audio data to the output.wav file
     
-    result = whisper_model.transcribe("output.wav")
+    result = whisper_model.transcribe("output.wav")#transcribes the audio data in output.wav to text using the Whisper model
     person = result["text"].strip()
     if not person:
         print("No speech detected. Please try again.")
@@ -80,14 +80,14 @@ while True:
         print("AI: I'm really concerned about your safety. It sounds like you're going through a tough time. Please consider reaching out to a trained professional or a crisis hotline for support. You can call or text 988 in the U.S. for immediate help.")
         continue
 
-    response = model.invoke(messages)
-    print("AI:", response.content)
-    speak(response.content)
+    response = model.invoke(messages)#response from the chatbot based on the conversation history in messages
+    print("AI:", response.content)#prints the chatbot's response to the console
+    speak(response.content)#speaks the chatbot's response
 
     messages.append({"role": "assistant", "content": response.content})#Append the Chatbot's response to the messages list
 
     with open("history.json", "w") as f:
-        json.dump(messages, f, indent=2)
+        json.dump(messages, f, indent=2)#write to the history.json file with the updated messages list
 
 
 
