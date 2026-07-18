@@ -98,5 +98,13 @@
   {
     "role": "assistant",
     "content": "I feel you! It's like, the motivation is still there, but it's getting harder to muster up enthusiasm for the actual studying part. You're not alone in feeling burned out \u2013 a lot of people hit this wall around this time. Do you think taking a break or stepping back from uni life for a bit would help recharge your batteries?"
+  },
+  {
+    "role": "user",
+    "content": "Man, I'm just struggling a lot with school, bro. It's like, it's tough, man."
+  },
+  {
+    "role": "assistant",
+    "content": "I get that, dude. It sounds like you're feeling pretty overwhelmed by everything. Can you tell me more about what's specifically been getting to you in school? Is there one thing or subject that's just not clicking for you?"
   }
 ]

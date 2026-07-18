@@ -5,8 +5,12 @@ import whisper
 import speech_recognition as sr
 import sounddevice as sd
 import soundfile as sf
+import pyttsx3
 
 model = init_chat_model("ollama:llama3.1", temperature=0.7)
+tts_engine = pyttsx3.init()
+tts_engine.setProperty('rate', 150)  # Set speech rate
+tts_engine.setProperty('volume', 1.0)  # Set volume level (0.0 to 1.0)
 
 if os.path.exists("history.json") and os.path.getsize("history.json") > 0:
     with open("history.json", "r") as f:
@@ -63,9 +67,13 @@ while True:
     if crisis_detected:
         print("AI: I'm really concerned about your safety. It sounds like you're going through a tough time. Please consider reaching out to a trained professional or a crisis hotline for support. You can call or text 988 in the U.S. for immediate help.")
         continue
-    response = model.invoke(messages)
 
+    response = model.invoke(messages)
     print("AI:", response.content)
+    tts_engine.say(response.content)
+    tts_engine.runAndWait()
+
+    
 
     messages.append({"role": "assistant", "content": response.content})#Append the Chatbot's response to the messages list
 
