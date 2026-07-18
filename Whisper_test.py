@@ -4,10 +4,13 @@ import sounddevice as sd
 import soundfile as sf
 
 r = sr.Recognizer()
+r.pause_threshold = 3.0
+r.dynamic_energy_threshold = False
 
 with sr.Microphone() as source:
     print("Adjusting for ambient noise...")
     r.adjust_for_ambient_noise(source,duration=1)
+    print(f"Minimum energy threshold set to: {r.energy_threshold}")
     print("Listening...")
     audio = r.listen(source)
 
@@ -23,6 +26,5 @@ print("Playing back the recorded audio...")
 sd.play(data, samplerate)
 sd.wait()
 
-
-
+print(result["text"])
 

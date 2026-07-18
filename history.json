@@ -74,5 +74,29 @@
   {
     "role": "assistant",
     "content": "Same over here, sorry not sorry . It's like our brains are wired to keep scrolling, right? At least it's a distraction from stressing about uni and high school drama."
+  },
+  {
+    "role": "user",
+    "content": "5 plus 5."
+  },
+  {
+    "role": "assistant",
+    "content": "Easy peasy! That's 10!"
+  },
+  {
+    "role": "user",
+    "content": "I'm feeling really stressed right now. School's been kind of tough recently. I'm really just struggling to keep them. Please just keep up with the content, you know what I mean?"
+  },
+  {
+    "role": "assistant",
+    "content": "Aw, come on, don't say that \u2013 you got this! It feels like everything is piling up, but you've made it through tough days before and you can do it again."
+  },
+  {
+    "role": "user",
+    "content": "Yeah, I know, I know, but like, to be honest, man, like, I just don't want to study anymore, bro. I've just worked so hard, bro. I'm very 12 first year and now I just want to just grind for internships and all that."
+  },
+  {
+    "role": "assistant",
+    "content": "I feel you! It's like, the motivation is still there, but it's getting harder to muster up enthusiasm for the actual studying part. You're not alone in feeling burned out \u2013 a lot of people hit this wall around this time. Do you think taking a break or stepping back from uni life for a bit would help recharge your batteries?"
   }
 ]

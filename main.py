@@ -2,8 +2,9 @@ from langchain.chat_models import init_chat_model
 import json
 import os
 import whisper
-
-
+import speech_recognition as sr
+import sounddevice as sd
+import soundfile as sf
 
 model = init_chat_model("ollama:llama3.1", temperature=0.7)
 
@@ -27,12 +28,31 @@ else:
 
 CRISIS_KEYWORDS = ["suicide", "self-harm", "hurt myself", "kill myself", "end my life", "want to die", "want to kill myself", "want to end my life", "want to hurt myself"]
 
-
+r = sr.Recognizer()
+r.pause_threshold = 3.0
+r.dynamic_energy_threshold = False
+whisper_model = whisper.load_model("base")
 
 #make a while loop to keep the conversation going
 while True:
-    person = input("You: ")
-    if person.lower() in ("exit", "quit"):
+    with sr.Microphone() as source:
+        print("Adjusting for ambient noise...")
+        r.adjust_for_ambient_noise(source,duration=1)
+        print(f"Minimum energy threshold set to: {r.energy_threshold}")
+        print("Listening...")
+        audio = r.listen(source)
+   
+    with open("output.wav", "wb") as f:
+        f.write(audio.get_wav_data())
+    
+    result = whisper_model.transcribe("output.wav")
+    person = result["text"].strip()
+    if not person:
+        print("No speech detected. Please try again.")
+        continue
+
+    if person.lower() in ["exit", "quit", "bye"]:
+        print("Exiting the conversation. Take care!")
         break
     messages.append({"role": "user", "content": person})#Append the user's message to the messages list
     for keyword in CRISIS_KEYWORDS:
