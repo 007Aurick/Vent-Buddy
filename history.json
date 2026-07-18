@@ -106,5 +106,85 @@
   {
     "role": "assistant",
     "content": "I get that, dude. It sounds like you're feeling pretty overwhelmed by everything. Can you tell me more about what's specifically been getting to you in school? Is there one thing or subject that's just not clicking for you?"
+  },
+  {
+    "role": "user",
+    "content": "Yeah, it's been a tough day, bro."
+  },
+  {
+    "role": "assistant",
+    "content": "It totally feels like some days are just impossible, right? Maybe take a deep breath and try to shake off the stress of today \u2013 tomorrow's a new day, and who knows, might be a fresh start?"
+  },
+  {
+    "role": "user",
+    "content": "Yeah sure, I'm gonna try to get some sleep tonight."
+  },
+  {
+    "role": "assistant",
+    "content": "That's a great plan! Hopefully, you'll wake up feeling a bit more refreshed and ready to tackle whatever uni throws at you tomorrow. Sweet dreams, bro!"
+  },
+  {
+    "role": "user",
+    "content": "Good night."
+  },
+  {
+    "role": "assistant",
+    "content": "Sweet night, buddy!"
+  },
+  {
+    "role": "user",
+    "content": "Bye."
+  },
+  {
+    "role": "assistant",
+    "content": "Later, take care of yourself!"
+  },
+  {
+    "role": "user",
+    "content": "It's up."
+  },
+  {
+    "role": "assistant",
+    "content": "Talk to you soon, then!"
+  },
+  {
+    "role": "user",
+    "content": "Just having rough day build overall"
+  },
+  {
+    "role": "assistant",
+    "content": "Some days just feel like they're piling all the struggles on your shoulders, huh? Hopefully tomorrow is a gentler one for ya."
+  },
+  {
+    "role": "user",
+    "content": "And, bruh, I'm just having a rough day today."
+  },
+  {
+    "role": "assistant",
+    "content": "Yeah, it's okay to have those days, man. Just ride it out and know that better ones are ahead."
+  },
+  {
+    "role": "user",
+    "content": "having any advice, do you have any advice on what I should do right now? It's 11.33pm."
+  },
+  {
+    "role": "assistant",
+    "content": "Honestly? Sometimes the best thing to do is just acknowledge how you're feeling and give yourself permission to not be okay. You can't control everything, but you can control how you show up for yourself in this moment. Why don't you try doing something that feels like a tiny bit of self-care \u2013 like putting on comfy PJs or making some tea?"
+  },
+  {
+    "role": "user",
+    "content": "No, I think what I'll do, honestly, I think what I'm gonna do is I'm just gonna go to bad, bro."
+  },
+  {
+    "role": "assistant",
+    "content": "Yeah, sometimes the best thing to do is just take a break and get out of your own head for a bit. Get some rest, recharge, and come back to whatever's been stressing you out tomorrow when you're feeling fresher. Goodnight, buddy!"
+  },
+  {
+    "role": "user",
+    "content": "Goodnight. Bye."
+  },
+  {
+    "role": "assistant",
+    "content": "Night, bro!"
   }
 ]

@@ -8,9 +8,8 @@ import soundfile as sf
 import pyttsx3
 
 model = init_chat_model("ollama:llama3.1", temperature=0.7)
-tts_engine = pyttsx3.init()
-tts_engine.setProperty('rate', 150)  # Set speech rate
-tts_engine.setProperty('volume', 1.0)  # Set volume level (0.0 to 1.0)
+
+
 
 if os.path.exists("history.json") and os.path.getsize("history.json") > 0:
     with open("history.json", "r") as f:
@@ -32,10 +31,20 @@ else:
 
 CRISIS_KEYWORDS = ["suicide", "self-harm", "hurt myself", "kill myself", "end my life", "want to die", "want to kill myself", "want to end my life", "want to hurt myself"]
 
+
+
 r = sr.Recognizer()
 r.pause_threshold = 3.0
 r.dynamic_energy_threshold = False
 whisper_model = whisper.load_model("base")
+
+def speak(text):
+    tts_engine = pyttsx3.init()
+    tts_engine.setProperty('rate', 150)  # Set speech rate
+    tts_engine.setProperty('volume', 1.0)  # Set volume level (0.0 to 1.0)
+    tts_engine.say(text)
+    tts_engine.runAndWait()
+    tts_engine.stop()
 
 #make a while loop to keep the conversation going
 while True:
@@ -70,8 +79,9 @@ while True:
 
     response = model.invoke(messages)
     print("AI:", response.content)
-    tts_engine.say(response.content)
-    tts_engine.runAndWait()
+    speak(response.content)
+
+    
 
     
 
@@ -79,6 +89,10 @@ while True:
 
     with open("history.json", "w") as f:
         json.dump(messages, f, indent=2)
+
+
+
+
     
 
 
