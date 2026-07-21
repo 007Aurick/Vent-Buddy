@@ -10,7 +10,7 @@ import soundfile as sf
 import pyttsx3
 from fpdf import FPDF
 
-model = init_chat_model("ollama:llama3.1", temperature=0.7)
+model = init_chat_model("claude-sonnet-4-6", temperature=0.7)
 
 REPORTS_DIR = Path(__file__).resolve().parent / "reports"
 REPORTS_DIR.mkdir(exist_ok=True)
