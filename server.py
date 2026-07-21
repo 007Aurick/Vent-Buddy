@@ -95,7 +95,11 @@ def summary():
                 "Please create a document report of the conversation we just had. "
                 "Include a summary of the main points discussed, any advice given, "
                 "and any important information shared. Keep it a solid 200-300 words. "
-                "Make it sound like a professional report."
+                "Make it sound like a professional report. Start directly with the "
+                "report content — do not include a title, a date line, a 'Prepared by' "
+                "line, or any placeholder brackets like [Insert Date], and do not use "
+                "markdown formatting (no **, #, -, etc.) since this goes straight into "
+                "a plain-text PDF."
             ),
         },
         {"role": "user", "content": str(history)},
@@ -114,7 +118,8 @@ def summary():
     pdf.cell(0, 10, "VentBuddy Session Report", new_x="LMARGIN", new_y="NEXT")
     pdf.set_font("Helvetica", "", 10)
     pdf.set_text_color(110, 110, 110)
-    pdf.cell(0, 8, now.strftime("%B %d, %Y at %I:%M %p"), new_x="LMARGIN", new_y="NEXT")
+    pdf.cell(0, 8, f"Date: {now.strftime('%B %d, %Y at %I:%M %p')}", new_x="LMARGIN", new_y="NEXT")
+    pdf.cell(0, 8, "Prepared by: VentBuddy", new_x="LMARGIN", new_y="NEXT")
     pdf.set_text_color(0, 0, 0)
     pdf.ln(4)
     pdf.set_font("Helvetica", "", 12)
