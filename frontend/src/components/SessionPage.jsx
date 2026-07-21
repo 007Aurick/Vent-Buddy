@@ -68,8 +68,8 @@ export default function SessionPage({ onExit }) {
   const finishSession = async () => {
     setPhase('wrapping-up')
     try {
-      const clientDate = new Date().toLocaleString('en-US', {
-        month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true,
+      const clientDate = new Date().toLocaleDateString('en-US', {
+        month: 'long', day: 'numeric', year: 'numeric',
       })
       const res = await fetch(`${API_BASE}/api/summary`, {
         method: 'POST',

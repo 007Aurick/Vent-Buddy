@@ -49,20 +49,23 @@ SUMMARY_SYSTEM_PROMPT = (
     "formatting of any kind (no **, no #, no bullet dashes). Plain prose paragraphs only."
 )
 
-_REPORT_HEADER_PREFIXES = (
-    "document report", "conversation summary", "session report",
-    "date:", "prepared by:", "participants:",
+_REPORT_TITLE_LINES = (
+    "document report", "conversation report", "conversation summary", "session report",
 )
+_REPORT_LABEL_LINE = re.compile(r"(?im)^\s*(date|prepared by|participants)\s*:.*$\n?")
 
 
 def clean_report_text(text):
     text = re.sub(r"\*\*(.*?)\*\*", r"\1", text)
     text = re.sub(r"^#+\s*", "", text, flags=re.MULTILINE)
+    # Strip any Date:/Prepared by:/Participants: line the model still adds,
+    # wherever it lands — not just at the very top.
+    text = _REPORT_LABEL_LINE.sub("", text)
 
     lines = text.strip().split("\n")
     while lines:
         stripped = lines[0].strip().lower()
-        if not stripped or stripped.startswith(_REPORT_HEADER_PREFIXES):
+        if not stripped or stripped in _REPORT_TITLE_LINES:
             lines.pop(0)
             continue
         break
