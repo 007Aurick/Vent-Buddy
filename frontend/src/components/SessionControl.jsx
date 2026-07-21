@@ -10,19 +10,35 @@ export default function SessionControl({ status, error, onRecordingComplete, rep
 
   const busy = status === 'processing'
 
+  const getSupportedMimeType = () => {
+    if (typeof MediaRecorder === 'undefined' || !MediaRecorder.isTypeSupported) return ''
+    const candidates = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', 'audio/ogg;codecs=opus']
+    return candidates.find((type) => MediaRecorder.isTypeSupported(type)) || ''
+  }
+
   const startRecording = async () => {
     setMicError(null)
+
+    // iOS Safari only allows speechSynthesis to be triggered from a direct
+    // tap — by the time the reply comes back (after two awaited network
+    // calls) it's too late. "Unlocking" it here, still inside this tap's
+    // call stack, lets the later speak() call in SessionPage actually work.
+    if (window.speechSynthesis) {
+      window.speechSynthesis.speak(new SpeechSynthesisUtterance(''))
+    }
+
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
       streamRef.current = stream
-      const recorder = new MediaRecorder(stream)
+      const mimeType = getSupportedMimeType()
+      const recorder = mimeType ? new MediaRecorder(stream, { mimeType }) : new MediaRecorder(stream)
       chunksRef.current = []
       recorder.ondataavailable = (e) => {
         if (e.data.size > 0) chunksRef.current.push(e.data)
       }
       recorder.onstop = () => {
         streamRef.current?.getTracks().forEach((t) => t.stop())
-        const blob = new Blob(chunksRef.current, { type: 'audio/webm' })
+        const blob = new Blob(chunksRef.current, { type: recorder.mimeType || 'audio/webm' })
         setRecording(false)
         onRecordingComplete(blob)
       }

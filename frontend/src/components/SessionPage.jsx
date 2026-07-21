@@ -18,11 +18,31 @@ function speak(text) {
       resolve()
       return
     }
+    // iOS Safari can silently drop an utterance without ever firing
+    // onend/onerror, which would otherwise hang this promise forever and
+    // leave the mic button stuck disabled. Cap how long we wait.
+    let done = false
+    const finish = () => {
+      if (done) return
+      done = true
+      clearTimeout(timer)
+      resolve()
+    }
+    const timer = setTimeout(finish, Math.max(4000, text.length * 90))
+
+    window.speechSynthesis.cancel()
     const utterance = new SpeechSynthesisUtterance(text)
-    utterance.onend = resolve
-    utterance.onerror = resolve
+    utterance.onend = finish
+    utterance.onerror = finish
     window.speechSynthesis.speak(utterance)
   })
+}
+
+function fileNameForBlob(blob) {
+  if (blob.type.includes('mp4')) return 'clip.m4a'
+  if (blob.type.includes('ogg')) return 'clip.ogg'
+  if (blob.type.includes('wav')) return 'clip.wav'
+  return 'clip.webm'
 }
 
 export default function SessionPage({ onExit }) {
@@ -69,7 +89,7 @@ export default function SessionPage({ onExit }) {
     try {
       setPhase('transcribing')
       const form = new FormData()
-      form.append('audio', audioBlob, 'clip.webm')
+      form.append('audio', audioBlob, fileNameForBlob(audioBlob))
       const transcribeRes = await fetch(`${API_BASE}/api/transcribe`, { method: 'POST', body: form })
       if (!transcribeRes.ok) throw new Error('transcription failed')
       const { text } = await transcribeRes.json()
