@@ -49,6 +49,13 @@ def speak(text):
     tts_engine.runAndWait()
     tts_engine.stop()
 
+####Summary of chat
+def summary(messages):
+    conversation_only = [m for m in messages if m["role"] != "system"]
+    summary_prompt = [{"role": "user", "content": "Please create a document report of the conversation we just had. Include a summary of the main points discussed, any advice given, and any important information shared. Keep it a solid 200-300 words. Make it sound like a professional report."}, {"role": "user", "content": str(conversation_only)}]
+    summary_response = model.invoke(summary_prompt)
+    with open("Summary.txt", "w") as f:
+        f.write(summary_response.content)
 #make a while loop to keep the conversation going
 while True:
     with sr.Microphone() as source:
@@ -69,7 +76,12 @@ while True:
 
     if any(phrase in person.lower() for phrase in EXIT_PHRASES):
         print("Exiting the conversation. Take care!")
+        summary(messages)
         break
+        
+
+        
+
     messages.append({"role": "user", "content": person})#Append the user's message to the messages list
     for keyword in CRISIS_KEYWORDS:
         crisis_detected = False
@@ -88,6 +100,7 @@ while True:
 
     with open("history.json", "w") as f:
         json.dump(messages, f, indent=2)#write to the history.json file with the updated messages list
+
 
 
 
