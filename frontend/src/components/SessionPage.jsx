@@ -3,81 +3,129 @@ import TherapistScene from './TherapistScene'
 import SessionControl from './SessionControl'
 import './SessionPage.css'
 
-const API_BASE = 'http://localhost:5000'
-const POLL_INTERVAL_MS = 1500
+const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5000'
 const GREETING = "Hi, I'm VentBuddy. I'm here to help you vent — whenever you're ready."
+
+const EXIT_PHRASES = [
+  'exit', 'quit', 'goodbye', 'good bye', 'bye',
+  "that's all", 'thats all', "i'm done", 'im done',
+  "i'm good", "that's it", 'thats it', 'see you', 'talk later',
+]
+
+function speak(text) {
+  return new Promise((resolve) => {
+    if (!window.speechSynthesis) {
+      resolve()
+      return
+    }
+    const utterance = new SpeechSynthesisUtterance(text)
+    utterance.onend = resolve
+    utterance.onerror = resolve
+    window.speechSynthesis.speak(utterance)
+  })
+}
 
 export default function SessionPage({ onExit }) {
   const [showGreeting, setShowGreeting] = useState(false)
-  const [status, setStatus] = useState('idle') // idle | starting | running | finished | error
+  const [status, setStatus] = useState('idle') // idle | processing | finished
+  const [phase, setPhase] = useState(null) // transcribing | thinking | speaking | wrapping-up
   const [error, setError] = useState(null)
-  const [chatState, setChatState] = useState('starting')
   const [latestReply, setLatestReply] = useState(null)
-  const pollRef = useRef(null)
+  const [reportUrl, setReportUrl] = useState(null)
+  const historyRef = useRef([]) // [{role, content}]
 
   useEffect(() => {
     const t = setTimeout(() => setShowGreeting(true), 700)
     return () => clearTimeout(t)
   }, [])
 
-  useEffect(() => () => clearInterval(pollRef.current), [])
+  useEffect(() => {
+    return () => {
+      if (reportUrl) URL.revokeObjectURL(reportUrl)
+    }
+  }, [reportUrl])
 
-  const pollSession = () => {
-    pollRef.current = setInterval(async () => {
-      try {
-        const [statusRes, transcriptRes] = await Promise.all([
-          fetch(`${API_BASE}/status`),
-          fetch(`${API_BASE}/transcript`),
-        ])
-        const statusData = await statusRes.json()
-        const transcriptData = await transcriptRes.json()
-
-        setChatState(transcriptData.state || 'starting')
-        const lastAssistant = [...(transcriptData.messages || [])]
-          .reverse()
-          .find((m) => m.role === 'assistant')
-        if (lastAssistant) setLatestReply(lastAssistant.content)
-
-        if (statusData.status === 'finished') {
-          clearInterval(pollRef.current)
-          setStatus('finished')
-        }
-      } catch {
-        // transient failure — keep polling
-      }
-    }, POLL_INTERVAL_MS)
+  const finishSession = async () => {
+    setPhase('wrapping-up')
+    try {
+      const res = await fetch(`${API_BASE}/api/summary`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ history: historyRef.current }),
+      })
+      if (!res.ok) throw new Error('summary failed')
+      const blob = await res.blob()
+      setReportUrl(URL.createObjectURL(blob))
+    } catch {
+      setError("Couldn't prepare your report, but your conversation has ended.")
+    }
+    setStatus('finished')
+    setPhase(null)
   }
 
-  const start = async () => {
-    setStatus('starting')
+  const handleRecordingComplete = async (audioBlob) => {
+    setStatus('processing')
     setError(null)
-    setChatState('starting')
-    setLatestReply(null)
     try {
-      const res = await fetch(`${API_BASE}/start`, { method: 'POST' })
-      if (!res.ok && res.status !== 409) throw new Error('Failed to start session')
-      setStatus('running')
-      pollSession()
+      setPhase('transcribing')
+      const form = new FormData()
+      form.append('audio', audioBlob, 'clip.webm')
+      const transcribeRes = await fetch(`${API_BASE}/api/transcribe`, { method: 'POST', body: form })
+      if (!transcribeRes.ok) throw new Error('transcription failed')
+      const { text } = await transcribeRes.json()
+      const person = (text || '').trim()
+
+      if (!person) {
+        setStatus('idle')
+        setPhase(null)
+        return
+      }
+
+      if (EXIT_PHRASES.some((phrase) => person.toLowerCase().includes(phrase))) {
+        await finishSession()
+        return
+      }
+
+      setPhase('thinking')
+      const chatRes = await fetch(`${API_BASE}/api/chat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: person, history: historyRef.current }),
+      })
+      if (!chatRes.ok) throw new Error('chat failed')
+      const data = await chatRes.json()
+
+      historyRef.current = [
+        ...historyRef.current,
+        { role: 'user', content: person },
+        { role: 'assistant', content: data.reply },
+      ]
+      setLatestReply(data.reply)
+
+      setPhase('speaking')
+      await speak(data.reply)
+
+      setStatus('idle')
+      setPhase(null)
     } catch (err) {
-      setError("Couldn't reach VentBuddy. Make sure the server is running.")
-      setStatus('error')
+      setError('Something went wrong. Check your connection and try again.')
+      setStatus('idle')
+      setPhase(null)
     }
   }
 
-  const downloadReport = () => {
-    window.open(`${API_BASE}/report/latest`, '_blank')
-  }
-
   const restart = () => {
-    clearInterval(pollRef.current)
-    setStatus('idle')
-    setError(null)
-    setChatState('starting')
+    historyRef.current = []
     setLatestReply(null)
+    setStatus('idle')
+    setPhase(null)
+    setError(null)
+    if (reportUrl) URL.revokeObjectURL(reportUrl)
+    setReportUrl(null)
   }
 
-  const isThinking = status === 'running' && chatState === 'thinking'
-  const bubbleText = (status === 'running' || status === 'finished') && latestReply ? latestReply : GREETING
+  const isThinking = phase === 'transcribing' || phase === 'thinking' || phase === 'wrapping-up'
+  const bubbleText = latestReply || GREETING
 
   return (
     <div className="session">
@@ -124,8 +172,8 @@ export default function SessionPage({ onExit }) {
         <SessionControl
           status={status}
           error={error}
-          onStart={start}
-          onDownload={downloadReport}
+          onRecordingComplete={handleRecordingComplete}
+          reportUrl={reportUrl}
           onRestart={restart}
         />
       </div>

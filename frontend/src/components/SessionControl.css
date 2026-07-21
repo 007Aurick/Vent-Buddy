@@ -61,6 +61,21 @@
   }
 }
 
+.mic-button.recording {
+  background: linear-gradient(140deg, #ff8a8a, #ff5c7a);
+  color: #2a0508;
+  animation: mic-recording-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes mic-recording-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(255, 92, 122, 0.45), 0 10px 30px -8px rgba(255, 92, 122, 0.6);
+  }
+  50% {
+    box-shadow: 0 0 0 16px rgba(255, 92, 122, 0), 0 10px 30px -8px rgba(255, 92, 122, 0.7);
+  }
+}
+
 .session-control-finished {
   display: flex;
   flex-direction: column;
@@ -87,4 +102,7 @@
 .primary-button {
   background: linear-gradient(100deg, #7bf0c8, #57c9f0);
   color: #04211c;
+  text-decoration: none;
+  display: inline-block;
+  cursor: pointer;
 }

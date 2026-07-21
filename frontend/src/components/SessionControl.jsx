@@ -1,38 +1,87 @@
+import { useRef, useState } from 'react'
 import './SessionControl.css'
 
-export default function SessionControl({ status, error, onStart, onDownload, onRestart }) {
-  return (
-    <div className="session-control">
-      {error && <p className="session-control-error">{error}</p>}
+export default function SessionControl({ status, error, onRecordingComplete, reportUrl, onRestart }) {
+  const [recording, setRecording] = useState(false)
+  const [micError, setMicError] = useState(null)
+  const mediaRecorderRef = useRef(null)
+  const chunksRef = useRef([])
+  const streamRef = useRef(null)
 
-      {(status === 'idle' || status === 'starting' || status === 'error') && (
-        <button
-          className="mic-button"
-          onClick={onStart}
-          disabled={status === 'starting'}
-          aria-label="Start session"
-        >
-          {status === 'starting' ? '…' : <MicIcon />}
-        </button>
-      )}
+  const busy = status === 'processing'
 
-      {status === 'running' && (
-        <div className="mic-button running" aria-label="Session in progress">
-          <MicIcon />
-        </div>
-      )}
+  const startRecording = async () => {
+    setMicError(null)
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+      streamRef.current = stream
+      const recorder = new MediaRecorder(stream)
+      chunksRef.current = []
+      recorder.ondataavailable = (e) => {
+        if (e.data.size > 0) chunksRef.current.push(e.data)
+      }
+      recorder.onstop = () => {
+        streamRef.current?.getTracks().forEach((t) => t.stop())
+        const blob = new Blob(chunksRef.current, { type: 'audio/webm' })
+        setRecording(false)
+        onRecordingComplete(blob)
+      }
+      mediaRecorderRef.current = recorder
+      recorder.start()
+      setRecording(true)
+    } catch {
+      setMicError("Couldn't access your microphone. Check your browser permissions and try again.")
+    }
+  }
 
-      {status === 'finished' && (
+  const stopRecording = () => {
+    mediaRecorderRef.current?.stop()
+  }
+
+  const toggleRecording = () => {
+    if (recording) {
+      stopRecording()
+    } else {
+      startRecording()
+    }
+  }
+
+  if (status === 'finished') {
+    return (
+      <div className="session-control">
         <div className="session-control-finished">
           <p className="session-control-hint">Your conversation has ended.</p>
-          <button className="primary-button" onClick={onDownload}>
-            Download Report
-          </button>
+          {error && <p className="session-control-error">{error}</p>}
+          {reportUrl ? (
+            <a className="primary-button" href={reportUrl} download="VentBuddy_Report.pdf">
+              Download Report
+            </a>
+          ) : (
+            !error && <p className="session-control-hint">Preparing your report…</p>
+          )}
           <button className="ghost-button" onClick={onRestart}>
             Start New Conversation
           </button>
         </div>
-      )}
+      </div>
+    )
+  }
+
+  return (
+    <div className="session-control">
+      {(error || micError) && <p className="session-control-error">{error || micError}</p>}
+
+      <button
+        className={`mic-button ${recording ? 'recording' : ''} ${busy ? 'running' : ''}`}
+        onClick={toggleRecording}
+        disabled={busy}
+        aria-label={recording ? 'Stop recording' : 'Start recording'}
+      >
+        {recording ? <StopIcon /> : <MicIcon />}
+      </button>
+      <p className="session-control-hint">
+        {recording ? 'Recording — tap to send' : busy ? 'One sec…' : 'Tap to talk'}
+      </p>
     </div>
   )
 }
@@ -47,6 +96,14 @@ function MicIcon() {
         strokeWidth="2"
         strokeLinecap="round"
       />
+    </svg>
+  )
+}
+
+function StopIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="6" y="6" width="12" height="12" rx="2" fill="currentColor" />
     </svg>
   )
 }
