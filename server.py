@@ -1,5 +1,6 @@
 import io
 import os
+import re
 from datetime import datetime
 
 from dotenv import load_dotenv
@@ -38,6 +39,35 @@ CRISIS_RESPONSE = (
     "tough time. Please consider reaching out to a trained professional or a crisis "
     "hotline for support. You can call or text 988 in the U.S. for immediate help."
 )
+
+SUMMARY_SYSTEM_PROMPT = (
+    "You write plain-text conversation summaries that get inserted directly into an "
+    "existing PDF template. The template already renders its own title, date, and "
+    "attribution lines above whatever you write. Output ONLY the summary paragraphs "
+    "themselves: no title, no 'Document Report' heading, no Date/Participants/"
+    "Prepared-by lines, no placeholder brackets like [Insert Date], and no markdown "
+    "formatting of any kind (no **, no #, no bullet dashes). Plain prose paragraphs only."
+)
+
+_REPORT_HEADER_PREFIXES = (
+    "document report", "conversation summary", "session report",
+    "date:", "prepared by:", "participants:",
+)
+
+
+def clean_report_text(text):
+    text = re.sub(r"\*\*(.*?)\*\*", r"\1", text)
+    text = re.sub(r"^#+\s*", "", text, flags=re.MULTILINE)
+
+    lines = text.strip().split("\n")
+    while lines:
+        stripped = lines[0].strip().lower()
+        if not stripped or stripped.startswith(_REPORT_HEADER_PREFIXES):
+            lines.pop(0)
+            continue
+        break
+
+    return "\n".join(lines).strip()
 
 
 @app.get("/health")
@@ -87,19 +117,16 @@ def chat():
 def summary():
     data = request.get_json(force=True) or {}
     history = data.get("history") or []
+    client_date = (data.get("client_date") or "").strip()
 
     summary_prompt = [
+        {"role": "system", "content": SUMMARY_SYSTEM_PROMPT},
         {
             "role": "user",
             "content": (
-                "Please create a document report of the conversation we just had. "
-                "Include a summary of the main points discussed, any advice given, "
-                "and any important information shared. Keep it a solid 200-300 words. "
-                "Make it sound like a professional report. Start directly with the "
-                "report content — do not include a title, a date line, a 'Prepared by' "
-                "line, or any placeholder brackets like [Insert Date], and do not use "
-                "markdown formatting (no **, #, -, etc.) since this goes straight into "
-                "a plain-text PDF."
+                "Please summarize the conversation we just had. Include the main "
+                "points discussed, any advice given, and any important information "
+                "shared. Keep it a solid 200-300 words and make it sound professional."
             ),
         },
         {"role": "user", "content": str(history)},
@@ -109,16 +136,19 @@ def summary():
         max_tokens=600,
         messages=summary_prompt,
     )
-    text = response.choices[0].message.content.encode("latin-1", "replace").decode("latin-1")
+    text = clean_report_text(response.choices[0].message.content)
+    text = text.encode("latin-1", "replace").decode("latin-1")
 
     now = datetime.now()
+    display_date = client_date or now.strftime("%B %d, %Y at %I:%M %p")
+
     pdf = FPDF()
     pdf.add_page()
     pdf.set_font("Helvetica", "B", 16)
     pdf.cell(0, 10, "VentBuddy Session Report", new_x="LMARGIN", new_y="NEXT")
     pdf.set_font("Helvetica", "", 10)
     pdf.set_text_color(110, 110, 110)
-    pdf.cell(0, 8, f"Date: {now.strftime('%B %d, %Y at %I:%M %p')}", new_x="LMARGIN", new_y="NEXT")
+    pdf.cell(0, 8, f"Date: {display_date}", new_x="LMARGIN", new_y="NEXT")
     pdf.cell(0, 8, "Prepared by: VentBuddy", new_x="LMARGIN", new_y="NEXT")
     pdf.set_text_color(0, 0, 0)
     pdf.ln(4)

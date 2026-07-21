@@ -68,10 +68,13 @@ export default function SessionPage({ onExit }) {
   const finishSession = async () => {
     setPhase('wrapping-up')
     try {
+      const clientDate = new Date().toLocaleString('en-US', {
+        month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true,
+      })
       const res = await fetch(`${API_BASE}/api/summary`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ history: historyRef.current }),
+        body: JSON.stringify({ history: historyRef.current, client_date: clientDate }),
       })
       if (!res.ok) throw new Error('summary failed')
       const blob = await res.blob()
