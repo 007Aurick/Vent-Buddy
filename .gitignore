@@ -1,0 +1,16 @@
+# Conversation data / generated artifacts — contains real user content
+history.json
+session_state.json
+output.wav
+Summary.txt
+reports/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Env / secrets
+.env
+.env.*

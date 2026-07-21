@@ -1,4 +1,6 @@
 from langchain.chat_models import init_chat_model
+from datetime import datetime
+from pathlib import Path
 import json
 import os
 import whisper
@@ -6,8 +8,14 @@ import speech_recognition as sr
 import sounddevice as sd
 import soundfile as sf
 import pyttsx3
+from fpdf import FPDF
 
 model = init_chat_model("ollama:llama3.1", temperature=0.7)
+
+REPORTS_DIR = Path(__file__).resolve().parent / "reports"
+REPORTS_DIR.mkdir(exist_ok=True)
+
+STATE_FILE = Path(__file__).resolve().parent / "session_state.json"
 
 
 
@@ -41,6 +49,13 @@ r.pause_threshold = 3.0
 r.dynamic_energy_threshold = False
 whisper_model = whisper.load_model("base")
 
+def write_state(state):
+    conversation_only = [m for m in messages if m["role"] != "system"]
+    tmp = STATE_FILE.with_suffix(".tmp")
+    with open(tmp, "w") as f:
+        json.dump({"state": state, "messages": conversation_only}, f)
+    tmp.replace(STATE_FILE)
+
 def speak(text):
     tts_engine = pyttsx3.init()
     tts_engine.setProperty('rate', 150)  # Set speech rate
@@ -54,20 +69,38 @@ def summary(messages):
     conversation_only = [m for m in messages if m["role"] != "system"]
     summary_prompt = [{"role": "user", "content": "Please create a document report of the conversation we just had. Include a summary of the main points discussed, any advice given, and any important information shared. Keep it a solid 200-300 words. Make it sound like a professional report."}, {"role": "user", "content": str(conversation_only)}]
     summary_response = model.invoke(summary_prompt)
-    with open("Summary.txt", "w") as f:
-        f.write(summary_response.content)
+    text = summary_response.content.encode("latin-1", "replace").decode("latin-1")
+
+    now = datetime.now()
+    timestamp = now.strftime("%Y%m%d_%H%M%S")
+    pdf_path = REPORTS_DIR / f"VentBuddy_Report_{timestamp}.pdf"
+
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font("Helvetica", "B", 16)
+    pdf.cell(0, 10, "VentBuddy Session Report", new_x="LMARGIN", new_y="NEXT")
+    pdf.set_font("Helvetica", "", 10)
+    pdf.set_text_color(110, 110, 110)
+    pdf.cell(0, 8, now.strftime("%B %d, %Y at %I:%M %p"), new_x="LMARGIN", new_y="NEXT")
+    pdf.set_text_color(0, 0, 0)
+    pdf.ln(4)
+    pdf.set_font("Helvetica", "", 12)
+    pdf.multi_cell(0, 7, text)
+    pdf.output(str(pdf_path))
 #make a while loop to keep the conversation going
 while True:
+    write_state("listening")
     with sr.Microphone() as source:
         print("Adjusting for ambient noise...")
         r.adjust_for_ambient_noise(source,duration=1)#looking for background noise for 1 second to adjust the energy threshold
         print(f"Minimum energy threshold set to: {r.energy_threshold}")
         print("Listening...")
         audio = r.listen(source)#listens for user speech
-   
+
     with open("output.wav", "wb") as f: #overwrite the output.wav file with the new audio data
         f.write(audio.get_wav_data())#writes the audio data to the output.wav file
-    
+
+    write_state("thinking")
     result = whisper_model.transcribe("output.wav")#transcribes the audio data in output.wav to text using the Whisper model
     person = result["text"].strip()
     if not person:
@@ -78,25 +111,25 @@ while True:
         print("Exiting the conversation. Take care!")
         summary(messages)
         break
-        
-
-        
 
     messages.append({"role": "user", "content": person})#Append the user's message to the messages list
-    for keyword in CRISIS_KEYWORDS:
-        crisis_detected = False
-        if keyword in person.lower():
-            crisis_detected = True
-            break
-    if crisis_detected:
-        print("AI: I'm really concerned about your safety. It sounds like you're going through a tough time. Please consider reaching out to a trained professional or a crisis hotline for support. You can call or text 988 in the U.S. for immediate help.")
+    write_state("thinking")
+
+    if any(keyword in person.lower() for keyword in CRISIS_KEYWORDS):
+        crisis_response = "I'm really concerned about your safety. It sounds like you're going through a tough time. Please consider reaching out to a trained professional or a crisis hotline for support. You can call or text 988 in the U.S. for immediate help."
+        print("AI:", crisis_response)
+        messages.append({"role": "assistant", "content": crisis_response})
+        write_state("speaking")
+        speak(crisis_response)
+        with open("history.json", "w") as f:
+            json.dump(messages, f, indent=2)
         continue
 
     response = model.invoke(messages)#response from the chatbot based on the conversation history in messages
+    messages.append({"role": "assistant", "content": response.content})#Append the Chatbot's response to the messages list
+    write_state("speaking")
     print("AI:", response.content)#prints the chatbot's response to the console
     speak(response.content)#speaks the chatbot's response
-
-    messages.append({"role": "assistant", "content": response.content})#Append the Chatbot's response to the messages list
 
     with open("history.json", "w") as f:
         json.dump(messages, f, indent=2)#write to the history.json file with the updated messages list
