@@ -84,5 +84,9 @@ VentBuddy is a **listening companion**, not a licensed therapist and not a crisi
 
 ▶️ Full Demo: https://www.youtube.com/watch?v=vsgJC1_OcGw
 
+## Author
+
+**Aurick Anwar**
+
 
 
