@@ -41,36 +41,23 @@ CRISIS_RESPONSE = (
 )
 
 SUMMARY_SYSTEM_PROMPT = (
-    "You write plain-text conversation summaries that get inserted directly into an "
-    "existing PDF template. The template already renders its own title, date, and "
-    "attribution lines above whatever you write. Output ONLY the summary paragraphs "
-    "themselves: no title, no 'Document Report' heading, no Date/Participants/"
-    "Prepared-by lines, no placeholder brackets like [Insert Date], and no markdown "
-    "formatting of any kind (no **, no #, no bullet dashes). Plain prose paragraphs only."
+    "You write a structured conversation report (a title, then sections like Summary, "
+    "Key Points Discussed, Advice Given, Next Steps, Conclusion — whatever fits). The "
+    "PDF template this gets inserted into already renders the real date and 'Prepared "
+    "by' line above your text, so do NOT include your own Date, Participants, or "
+    "Prepared-by line, and never use placeholder brackets like [Insert Date] or "
+    "[Your Name]."
 )
 
-_REPORT_TITLE_LINES = (
-    "document report", "conversation report", "conversation summary", "session report",
+_REPORT_LABEL_LINE = re.compile(
+    r"(?im)^\s*\**\s*(date|prepared by|participants)\s*:\s*\**\s*.*$\n?"
 )
-_REPORT_LABEL_LINE = re.compile(r"(?im)^\s*(date|prepared by|participants)\s*:.*$\n?")
 
 
 def clean_report_text(text):
-    text = re.sub(r"\*\*(.*?)\*\*", r"\1", text)
-    text = re.sub(r"^#+\s*", "", text, flags=re.MULTILINE)
-    # Strip any Date:/Prepared by:/Participants: line the model still adds,
-    # wherever it lands — not just at the very top.
-    text = _REPORT_LABEL_LINE.sub("", text)
-
-    lines = text.strip().split("\n")
-    while lines:
-        stripped = lines[0].strip().lower()
-        if not stripped or stripped in _REPORT_TITLE_LINES:
-            lines.pop(0)
-            continue
-        break
-
-    return "\n".join(lines).strip()
+    # Strip any Date:/Prepared by:/Participants: line the model still adds
+    # despite instructions — the template already shows the real ones.
+    return _REPORT_LABEL_LINE.sub("", text).strip()
 
 
 @app.get("/health")
@@ -143,7 +130,7 @@ def summary():
     text = text.encode("latin-1", "replace").decode("latin-1")
 
     now = datetime.now()
-    display_date = client_date or now.strftime("%B %d, %Y at %I:%M %p")
+    display_date = client_date or now.strftime("%B %d, %Y")
 
     pdf = FPDF()
     pdf.add_page()
