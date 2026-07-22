@@ -80,7 +80,7 @@ VentBuddy is a **listening companion**, not a licensed therapist and not a crisi
 
 ## 🚀 Demo
 
-![Preview](https://img.youtube.com/vi/ueAmlV6UAzs/0.jpg)
+![Preview](https://img.youtube.com/vi/vsgJC1_OcGw/0.jpg)
 
 ▶️ Full Demo: https://www.youtube.com/watch?v=vsgJC1_OcGw
 
