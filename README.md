@@ -78,3 +78,11 @@ VentBuddy: That sounds heavy. Want to tell me what happened?
 VentBuddy is a **listening companion**, not a licensed therapist and not a crisis service. If you're in crisis or experiencing thoughts of self-harm, please reach out to a real human — a crisis line, a trusted person, or a professional. 💛
 
 
+## 🚀 Demo
+
+![Preview](https://img.youtube.com/vi/ueAmlV6UAzs/0.jpg)
+
+▶️ Full Demo: https://www.youtube.com/watch?v=vsgJC1_OcGw
+
+
+
